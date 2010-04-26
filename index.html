@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> jQuery Google Maps </title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" charset="utf-8"></script>
+	<script src="jquery.gmap.js" charset="utf-8"></script>
+	<script>
+	$(function() {
+		$('.interactiveMap').gMap({
+			center: "Wichita Falls, TX 76309",
+			width: 500,
+			height: 500,
+			zoom: 11,
+			markers: [
+				{
+					color: "blue",
+					address: "Wichita Falls, TX"
+				},
+				{
+					size: "small",
+					color: "green",
+					address: "3906 Circle Dr. Wichita Falls, TX 76309"
+				},
+				{
+					size: "mid",
+					address: "Iowa Park, TX"
+				}
+			]
+		});
+		$("#staticMap").gMap({
+			type: "static",
+			width: 500,
+			height: 500,
+			visible: "Wichita Falls, TX", //Wichita Falls, TX|Dallas, TX
+			zoom: 11,
+			markers: [
+				{
+					color: "blue",
+					address: "Wichita Falls, TX"
+				},
+				{
+					size: "small",
+					color: "green",
+					address: "3906 Circle Dr. Wichita Falls, TX 76309"
+				},
+				{
+					size: "mid",
+					address: "Iowa Park, TX"
+				}
+			]
+		});
+	});
+	</script>
+</head>
+<body>
+	<div class="interactiveMap"></div>
+	<div id="staticMap"></div>
+</body>
+</html>
