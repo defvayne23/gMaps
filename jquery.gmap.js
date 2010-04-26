@@ -50,7 +50,7 @@
 		};
 		
 		this.each(function() {
-			
+			var self = this;
 			// Attach function functions to element for latter adding
 			$.extend(self, {
 				addMarker: function(options) {
@@ -120,25 +120,34 @@
 				url += '&sensor=' + options.sensor;
 				
 				// Append image element at end of given element
-				$(this).html('<img src="' + url + '" width="' + options.width +'" height="' + options.height +'" alt="' + options.title +'" title="' + options.title +'" >');
+				$(self).html('<img src="' + url + '" width="' + options.width +'" height="' + options.height +'" alt="' + options.title +'" title="' + options.title +'" >');
 			} else {
+				$(self).width(options.width);
+				$(self).height(options.height);
+				
+				var map = new google.maps.Map(
+					self,
+					{
+						zoom: options.zoom,
+						mapTypeId: options.type
+					}
+				);
+				var bounds = new google.maps.LatLngBounds(0, 0);
+				
 				// Check center type
 				if(latlng = options.center.match(/([0-9.-]+), ([0-9.-]+)/i)) {
 					// Lat & Lng given
-					center = new google.maps.LatLng(latlng[1], latlng[2]);
+					map.setCenter(new google.maps.LatLng(latlng[1], latlng[2]));
 				} else {
 					// Address given
 					center = new google.maps.LatLng(0, 0);
-					var map = this;
 					new google.maps.Geocoder().geocode({
 							address: options.center
 						},
 						function(results, status) {
 							if (status == google.maps.GeocoderStatus.OK && results.length) {
 								if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
-									map = $(map).data('map');
 									map.setCenter(results[0].geometry.location);
-									$(map).data('map', map);
 		        				}
 							} else {
 								alert("Geocode was unsuccessful due to: " + status);
@@ -146,27 +155,14 @@
 						}
 					);
 				}
-				
-				$(this).width(options.width);
-				$(this).height(options.height);
-				
-				var map = new google.maps.Map(
-					this,
-					{
-						zoom: options.zoom,
-						center: center,
-						mapTypeId: options.type
-					})
-				);
-				var bounds = new google.maps.LatLngBounds(0, 0));
 			}
 			
 			// Add Markers
 			$(options.markers).each(function(item, markerOptions) {
-				var markerOptions = $.extend(markers, options);
+				var markerOptions = $.extend(markers, markerOptions);
 				
 				if(options.type == 'static') {
-					var image = $(this).find('img');
+					var image = $(self).find('img');
 					var url = image.attr('src');
 					var marker = '';
 					
@@ -218,7 +214,7 @@
 						);
 					}
 				
-					marker.setPosition(point);
+					//marker.setPosition(point);
 				}
 			});
 			
