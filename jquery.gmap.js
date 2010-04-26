@@ -51,55 +51,6 @@
 		
 		this.each(function() {
 			var self = this;
-			// Attach function functions to element for latter adding
-			$.extend(self, {
-				addMarker: function(options) {
-					
-			
-					return this;
-				},
-				addPolygon: function() {
-					$(this).each(function() {
-						if(options.type == 'static') {
-						
-						} else {
-							var map = $(this).data('map');
-						
-							// Marker code
-						
-							$(this).data('map', map);
-						}
-					});
-				
-					return this;
-				},
-				addPolyline: function() {
-					var polylineOptions = $.extend(polylines, elem);
-			
-					$(this).each(function() {
-						if(options.type == 'static') {
-							var polyline = '';
-					
-							// Settings
-							polyline += '';
-					
-							// Loop points
-					
-					
-							// Add polyline to url
-							url += '&polylines=' + polyline;
-						} else {
-							var map = $(this).data('map');
-					
-							// Marker code
-					
-							$(this).data('map', map);
-						}
-					});
-			
-					return this;
-				}
-			});
 			
 			if(options.type == 'static') {
 				var url = options.apiUrl;
@@ -205,7 +156,7 @@
 							function(results, status) {
 								if (status == google.maps.GeocoderStatus.OK && results.length) {
 									if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
-										this.marker.marker.setPosition(results[0].geometry.location);
+										//marker.setPosition(results[0].geometry.location);
 						        	}
 								} else {
 									alert("Geocode was unsuccessful due to: " + status);
@@ -213,17 +164,47 @@
 							}
 						);
 					}
-				
-					//marker.setPosition(point);
 				}
 			});
 			
 			// Add polylines
 			$(options.polylines).each(function(item, options) {
-				self.addPolyline(options);
+				var polylineOptions = $.extend(polylines, elem);
+				
+				if(options.type == 'static') {
+					var polyline = '';
+					
+					// Settings
+					polyline += '';
+					
+					// Loop points
+					
+			
+					// Add polyline to url
+					url += '&polylines=' + polyline;
+				} else {
+					var map = $(this).data('map');
+					
+					// Marker code
+					
+					$(this).data('map', map);
+				}
 			});
 			
-			// Return given element
+			// Add polygon
+			$(options.plygons).each(function(item, options) {
+				
+				
+				if(options.type == 'static') {
+				
+				} else {
+					var map = $(this).data('map');
+				
+					// Marker code
+				
+					$(this).data('map', map);
+				}
+			});
 		});
 		
 		return this;
