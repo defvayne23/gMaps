@@ -10,53 +10,90 @@
 	<script>
 	$(function() {
 		$('.interactiveMap').gMap({
-			center: "Wichita Falls, TX 76309",
+			center: [33.882141,-98.433207],
+			type: 'hybrid',
 			width: 500,
 			height: 500,
 			zoom: 11,
 			markers: [
 				{
-					color: "blue",
-					address: "Wichita Falls, TX"
+					latlng: [33.818501,-98.194472],
+					content: 'Test 1',
+					icon: { color: "blue" }
 				},
 				{
-					size: "small",
-					color: "green",
-					address: "3906 Circle Dr. Wichita Falls, TX 76309"
+					latlng: [34.080461,-98.563501],
+					content: 'Test 2',
+					icon: { size: "small", color: "green" }
 				},
 				{
-					size: "mid",
-					address: "Iowa Park, TX"
+					address: "Santa Fe, NM",
+					content: 'Test 5',
+				},
+				{
+					address: "Pheoniz, AZ",
+					content: 'Test 5',
+				},
+				{
+					address: "Salt Lake City, UT",
+					content: 'Test 5',
+				},
+				{
+					address: "Denver, CO",
+					content: 'Test 5',
+				},
+				{
+					address: "Indionapolis, IN",
+					content: 'Test 5',
+				},
+				{
+					address: "San Jose, CA",
+					content: 'Test 5',
 				}
-			]
+			],
+			error: function(element, error) {
+				$(".error").html(error);
+			}
 		});
-		$("#staticMap").gMap({
-			type: "static",
+		$(".staticMap").gMap({
+			map: "static",
 			width: 500,
 			height: 500,
-			visible: "Wichita Falls, TX", //Wichita Falls, TX|Dallas, TX
-			zoom: 11,
 			markers: [
 				{
-					color: "blue",
-					address: "Wichita Falls, TX"
+					address: "Wichita Falls, TX",
+					icon: { color: "blue" }
 				},
 				{
-					size: "small",
-					color: "green",
-					address: "3906 Circle Dr. Wichita Falls, TX 76309"
+					address: "3906 Circle Dr. Wichita Falls, TX 76309",
+					icon: { size: "small", color: "green" }
 				},
 				{
-					size: "mid",
-					address: "Iowa Park, TX"
+					address: "Iowa Park, TX",
+					icon: { size: "mid" }
 				}
-			]
+			],
+			polygons: [
+				{
+					points: [
+						[33.85839163821079, -98.48906972802736],
+						[33.88233677114602, -98.5570476333008],
+						[33.978050098130055, -98.50486257470705]
+					],
+					stroke: { color: '00ff00', weight: 7, opacity: 1 },
+					fill: { color: '00ff00', opacity: 0.2 }
+				}
+			],
+			error: function(element, error) {
+				$(".error").html(error);
+			}
 		});
 	});
 	</script>
 </head>
 <body>
+	<div class="error"></div>
 	<div class="interactiveMap"></div>
-	<div id="staticMap"></div>
+	<div class="staticMap"></div>
 </body>
 </html>
