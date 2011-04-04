@@ -1,0 +1,54 @@
+body {
+	font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+}
+
+a:link, a:visited, a:active {
+	color: #333;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+#wrapper {
+	width:921px;
+	margin: 20px auto;
+}
+
+nav {
+	display: block;
+	overflow: hidden;
+	background: #EBEBEB;
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin-bottom: 20px;
+}
+
+nav ul {
+	float: left;
+}
+
+nav ul li {
+	display: inline;
+}
+
+nav ul li a:link, nav ul li a:visited, nav ul li a:active {
+	display: block;
+	float: left;
+	color: #333;
+	border-left: 1px solid #ccc;
+	padding-left: 20px;
+	margin-left: 20px;
+	text-decoration: none;
+}
+
+nav ul li:first-child a {
+	border-left: 0;
+	padding-left: 0;
+	margin-left: 0;
+}
+
+nav ul li a:hover {
+	text-decoration: underline;
+}

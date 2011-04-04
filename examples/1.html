@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> jQuery Google Maps </title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	
+	<link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" charset="utf-8">
+	<link rel="stylesheet" href="../css/screen.css" type="text/css" media="screen" charset="utf-8">
+	
+	<style>
+	#maps {
+		overflow: hidden;
+	}
+	
+	#maps div.map {
+		float: left;
+		margin-left: 20px;
+	}
+	#maps div.map:first-child {
+		margin-left: 0;
+	}
+	</style>
+	
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" charset="utf-8"></script>
+	<script src="../gMaps/jquery.gmap.js" charset="utf-8"></script>
+	<script>
+	$(function() {
+		$('.interactiveMap').gMap({
+			visible: [
+				{address: "Oklahoma City, Oklahoma"},
+				{latlng: [40.7607793, -111.8910474]}
+			],
+			width: 450,
+			height: 450,
+			markers: [
+				{
+					latlng: [33.818501,-98.194472],
+					content: 'Test 0',
+					icon: {size: "small", color: "blue"}
+				},
+				{
+					address: "Wichita Falls, TX",
+					icon: {color: "blue"}
+				},
+				{
+					address: "3906 Circle Dr. Wichita Falls, TX 76309",
+					icon: {size: "small", color: "green"}
+				},
+				{
+					address: "Iowa Park, TX",
+					icon: {size: "mid"}
+				}
+			],
+			polygons: [
+				{
+					points: [
+						[33.85839163821079, -98.48906972802736],
+						[33.88233677114602, -98.5570476333008],
+						[33.978050098130055, -98.50486257470705]
+					],
+					stroke: {color: '00ff00', weight: 7, opacity: 1},
+					fill: {color: '00ff00', opacity: 0.2}
+				}
+			],
+			error: function(element, error) {
+				$(".error").html(error);
+			}
+		});
+		$(".staticMap").gMap({
+			map: "static",
+			visible: [
+				{address: "Oklahoma City, Oklahoma"},
+				{latlng: [40.7607793, -111.8910474]}
+			],
+			width: 450,
+			height: 450,
+			markers: [
+				{
+					latlng: [33.818501,-98.194472],
+					content: 'Test 0',
+					icon: {size: "small", color: "blue"}
+				},
+				{
+					address: "Wichita Falls, TX",
+					icon: {color: "blue"}
+				},
+				{
+					address: "3906 Circle Dr. Wichita Falls, TX 76309",
+					icon: {size: "small", color: "green"}
+				},
+				{
+					address: "Iowa Park, TX",
+					icon: {size: "mid"}
+				}
+			],
+			polygons: [
+				{
+					points: [
+						[33.85839163821079, -98.48906972802736],
+						[33.88233677114602, -98.5570476333008],
+						[33.978050098130055, -98.50486257470705]
+					],
+					stroke: {color: '00ff00', weight: 7, opacity: 1},
+					fill: {color: '00ff00', opacity: 0.2}
+				}
+			],
+			error: function(element, error) {
+				$(".error").html(error);
+			}
+		});
+	});
+	</script>
+</head>
+<body>
+
+<div id="wrapper">
+	<nav>
+		<ul>
+			<li><a href="1.html">Multiple Maps</a></li>
+			<li><a href="2.html">Switch Maps</a></li>
+		</ul>
+	</nav>
+	<div class="error"></div>
+	<div id="maps">
+		<div class="map interactiveMap"></div>
+		<div class="map staticMap"></div>
+	</div>
+</div>
+
+</body>
+</html>

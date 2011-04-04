@@ -7,10 +7,10 @@
  * Developed by John Hoover <john@defvayne23.com>
  * Another project from monkeeCreate <http://monkeecreate.com>
  *
- * Version 3.0.0- Last updated: May 17, 2010
+ * Version 3.0.0- Last updated: September 30, 2010
 */
 (function($) {
-	jQuery.fn.gMap = function(options){
+	jQuery.fn.gMap = function(options) {
 		var gMap;
 		// Default map settings
 		var options = $.extend({
@@ -19,12 +19,15 @@
 			width: 200,
 			height: 200,
 			center: '',
-			visible: '',
+			visible: [],
 			zoom: '',
 			type: 'roadmap', //roadmap, satellite, hybrid, and terrain
 			markers: [],
 			polylines: [],
 			polygons: [],
+			
+			/** Interactive Map **/
+			bounds: true,
 			
 			/** Static Map **/
 			format: 'png-32', //png-8, png-32, gif, jpg, jpg-baseline
@@ -32,9 +35,14 @@
 			sensor: 'false', //STRING NOT BOOL
 			title: 'Google Maps',
 			
-			error: function(error){}
+			error: function(error) {}
 		}, options);
 		var apiUrl = 'http://maps.google.com/maps/api/staticmap?';
+		
+		var visible = {
+			address: '',
+			latlng: []
+		};
 		
 		// Default marker settings
 		var markersDefOptions = {
@@ -91,6 +99,10 @@
 		this.each(function() {
 			var self = this;
 			
+			// Set width and height of element
+			$(self).width(options.width);
+			$(self).height(options.height);
+			
 			// Initialize map by type
 			if(options.map == 'static') {
 				var url = apiUrl;
@@ -107,25 +119,26 @@
 					url += '&zoom=' + options.zoom;
 				}
 				
-				if(options.visible != '') {
-					url += '&visible=' + escape(options.visible);
-				}
+				urlVisible = [];
+				$(options.visible).each(function(index, location) {
+					var location = $.extend({}, visible, location);
+					
+					if(location.address != '')
+						urlVisible.push(escape(location.address));
+					else
+						urlVisible.push(location.latlng[0] + ',' + location.latlng[1]);
+				});
+				if(urlVisible.length > 0)
+					url += '&visible=' + urlVisible.join('|');
 				
 				url += '&type=' + options.type;
 				url += '&mobile=' + options.mobile;
 				url += '&sensor=' + options.sensor;
 			} else {
-				// Set width and height of element
-				$(self).width(options.width);
-				$(self).height(options.height);
-				
 				// Initialize map
 				var map = new google.maps.Map(
 					self,
-					{
-						zoom: options.zoom,
-						mapTypeId: options.type
-					}
+					{mapTypeId: options.type, streetViewControl: true}
 				);
 				
 				// Geocoder
@@ -137,17 +150,54 @@
 				// Initialize map bounds
 				var bounds = new google.maps.LatLngBounds(0, 0);
 				
-				// Set map center
-				if(options.center[0] != '') {
-					// Lat & Lng given
-					map.setCenter(new google.maps.LatLng(options.center[0], options.center[1]));
-				} else {
-					// Address given
-					center = new google.maps.LatLng(0, 0);
+				if(options.zoom != '') {
+					map.setZoom(options.zoom);
 				}
 				
+				// Set map center
+				if(options.center[0] instanceof Array) {
+					// Lat & Lng given
+					map.setCenter(new google.maps.LatLng(options.center[0], options.center[1]));
+				} else if(options.center != '') {
+					// Address given
+					geocoder.geocode( {'address': options.center}, function(results, status) {
+						if (status == google.maps.GeocoderStatus.OK) {
+							map.setCenter(results[0].geometry.location);
+							bounds.extend(results[0].geometry.location);
+							
+							if(options.bounds == true) {
+								map.fitBounds(bounds);
+							}
+						} else {
+							options.error(self, "Geocode was not successful for the following reason: "+status);
+						}
+					});
+				}
+				
+				// Visible
+				$(options.visible).each(function(item, location) {
+					var location = $.extend({}, visible, location);
+					
+					if(location.address != '') {
+						geocoder.geocode( {'address': location.address}, function(results, status) {
+							if (status == google.maps.GeocoderStatus.OK) {
+								bounds.extend(results[0].geometry.location);
+								
+								if(options.bounds == true) {
+									map.fitBounds(bounds);
+								}
+							} else {
+								options.error(self, "Geocode was not successful for the following reason: "+status);
+							}
+						});
+					} else {
+						point = new google.maps.LatLng(location.latlng[0], location.latlng[1]);
+						bounds.extend(point);
+					}
+				})
+				
 				// Close info windows when clicking on map
-				google.maps.event.addListener(map, "click", function(event){
+				google.maps.event.addListener(map, "click", function(event) {
 					infoWindow.close();
 				});
 			}
@@ -172,16 +222,16 @@
 					
 					// Icon
 					if(markerOptions.icon.image != '') {
-						marker += '|icon:'+escape(markerOptions.icon.image);
+						marker += '|icon:' + escape(markerOptions.icon.image);
 					}
 				
 					// Location
 					if(markerOptions.address != '') {
 						// Address
-						marker += '|' + escape(markerOptions.address);
+						marker += '|'+escape(markerOptions.address);
 					} else {
 						// Lat/Lng
-						marker += '';
+						marker += '|'+markerOptions.latlng[0] + "," + markerOptions.latlng[1];
 					}
 				
 					// Add marker to url
@@ -203,13 +253,16 @@
 						bounds.extend(point);
 					} else {
 						// Address given
-						geocoder.geocode( { 'address': markerOptions.address}, function(results, status) {
+						geocoder.geocode( {'address': markerOptions.address}, function(results, status) {
 							if (status == google.maps.GeocoderStatus.OK) {
 								marker.setPosition(results[0].geometry.location);
 								bounds.extend(results[0].geometry.location);
-								map.fitBounds(bounds);
+								
+								if(options.bounds == true) {
+									map.fitBounds(bounds);
+								}
 							} else {
-								options.error(self, "Geocode was not successful for the following reason: " + status);
+								options.error(self, "Geocode was not successful for the following reason: "+status);
 							}
 						});
 					}
@@ -217,16 +270,53 @@
 					// Icon
 					if(markerOptions.icon.image != '') {
 						// Complex Icon
-						marker.setIcon(
-							new google.maps.MarkerImage(
-								markerOptions.icon.image,
-      							new google.maps.Size(markerOptions.icon.size[0], markerOptions.icon.size[1]),
-      							new google.maps.Point(markerOptions.icon.origin[0], markerOptions.icon.origin[1]),
-      							new google.maps.Point(markerOptions.icon.anchor[0], markerOptions.icon.anchor[1])
-							)
-						);
+						if(markerOptions.icon.size instanceof Array || markerOptions.icon.origin instanceof Array || markerOptions.icon.anchor instanceof Array) {
+							marker.setIcon(
+								new google.maps.MarkerImage(
+									markerOptions.icon.image,
+	      							new google.maps.Size(markerOptions.icon.size[0], markerOptions.icon.size[1]),
+	      							new google.maps.Point(markerOptions.icon.origin[0], markerOptions.icon.origin[1]),
+	      							new google.maps.Point(markerOptions.icon.anchor[0], markerOptions.icon.anchor[1])
+								)
+							);
+						} else {
+							marker.setIcon(markerOptions.icon.image);
+						}
 					} else {
 						// Simple Icon
+						icon = "https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=A|";
+						
+						switch(markerOptions.icon.size) {
+							case "tiny": icon += "1|0"; size = [15,25]; origin = [0,0]; anchor = [0,0]; break;
+							case "mid": size = [21,34]; origin = [0,0]; anchor = [0,0]; break;
+							case "small": size = [10,17]; origin = [0,0]; anchor = [0,0]; break;
+							default: size = [21,34]; origin = [0,0]; anchor = [0,0]; 
+						}
+						
+						switch(markerOptions.icon.color) {
+							case "black": icon += "525252"; break;
+							case "brown": icon += "000000"; break;
+							case "green": icon += "64b949"; break;
+							case "purple": icon += "000000"; break;
+							case "yellow": icon += "000000"; break;
+							case "blue": icon += "3689cc"; break;
+							case "gray": icon += "000000"; break;
+							case "orange": icon += "000000"; break;
+							case "red": icon += "ff776b"; break;
+							case "white": icon += "ffffff"; break;
+							default: icon += "ff776b";
+						}
+						
+						icon += "|000000";
+						
+						marker.setIcon(
+							new google.maps.MarkerImage(
+								icon,
+      							new google.maps.Size(size[0], size[1]),
+      							new google.maps.Point(origin[0], origin[1]),
+      							new google.maps.Point(anchor[0], anchor[1])
+							)
+						);
 					}
 					
 					// Shadow
@@ -243,8 +333,12 @@
 					
 					// Info Window
 					google.maps.event.addListener(marker, "click", function() {
+						infoWindow.close();
+						
 						infoWindow.setOptions({content: markerOptions.content});
-						infoWindow.open(map, marker);
+						
+						if(markerOptions.content != '')
+							infoWindow.open(map, marker);
 					});
 
 				}
@@ -269,7 +363,7 @@
 					polyline += '|weight:' + polylineOptions.stroke.weight;
 					
 					$(polylineOptions.points).each(function(item, point) {
-						polyline += '|'+point[0]+','+point[1];
+						polyline += '|'+ point[0] + ',' + point[1];
 					});
 				
 					// Add polyline to url
@@ -282,7 +376,7 @@
 					var polyline = new google.maps.Polyline({
 						map: map,
 						path: polylinePoints,
-						strokeColor: '#'+polylineOptions.stroke.color,
+						strokeColor: '#' + polylineOptions.stroke.color,
 						strokeOpacity: polylineOptions.stroke.opacity,
 						strokeWeight: polylineOptions.stroke.weight
 					});
@@ -328,10 +422,10 @@
 					polygon += '|fillcolor:0x' + polygonOptions.fill.color+fillHex;
 					
 					$(polygonOptions.points).each(function(item, point) {
-						polygon += '|'+point[0]+','+point[1];
+						polygon += '|' + point[0] + ',' + point[1];
 						
 						if(polygonOptions.points.length - 1 == item)
-							polygon += '|'+polygonOptions.points[0][0]+','+polygonOptions.points[0][1];
+							polygon += '|' + polygonOptions.points[0][0] + ',' + polygonOptions.points[0][1];
 					});
 				
 					// Add polygon to url
@@ -344,10 +438,10 @@
 					var polygon = new google.maps.Polygon({
 						map: map,
 						path: polygonPoints,
-						strokeColor: '#'+polygonOptions.stroke.color,
+						strokeColor: '#' + polygonOptions.stroke.color,
 						strokeOpacity: polygonOptions.stroke.opacity,
 						strokeWeight: polygonOptions.stroke.weight,
-						fillColor: '#'+polygonOptions.fill.color,
+						fillColor: '#' + polygonOptions.fill.color,
 						fillOpacity: polygonOptions.fill.opacity
 					});
 					
@@ -371,10 +465,12 @@
 					options.error(self, "URL for image exceeded max length of 2048 characters.");
 				} else {
 					// Replace html of given element with image
-					$(self).html('<img src="' + url + '" width="' + options.width +'" height="' + options.height +'" alt="' + options.title +'" title="' + options.title +'" >');
+					$(self).html('<img src="' + url + '" width="' + options.width + '" height="' + options.height + '" alt="' + options.title + '">');
 				}
 			} else {
-				map.fitBounds(bounds);
+				if(options.bounds == true) {
+					map.fitBounds(bounds);
+				}
 			}
 		});
 		

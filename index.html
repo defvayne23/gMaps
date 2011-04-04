@@ -3,97 +3,13 @@
 <head>
 	<title> jQuery Google Maps </title>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-	
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" charset="utf-8"></script>
-	<script src="jquery.gmap.js" charset="utf-8"></script>
-	<script>
-	$(function() {
-		$('.interactiveMap').gMap({
-			center: [33.882141,-98.433207],
-			type: 'hybrid',
-			width: 500,
-			height: 500,
-			zoom: 11,
-			markers: [
-				{
-					latlng: [33.818501,-98.194472],
-					content: 'Test 1',
-					icon: { color: "blue" }
-				},
-				{
-					latlng: [34.080461,-98.563501],
-					content: 'Test 2',
-					icon: { size: "small", color: "green" }
-				},
-				{
-					address: "Santa Fe, NM",
-					content: 'Test 5',
-				},
-				{
-					address: "Pheoniz, AZ",
-					content: 'Test 5',
-				},
-				{
-					address: "Salt Lake City, UT",
-					content: 'Test 5',
-				},
-				{
-					address: "Denver, CO",
-					content: 'Test 5',
-				},
-				{
-					address: "Indionapolis, IN",
-					content: 'Test 5',
-				},
-				{
-					address: "San Jose, CA",
-					content: 'Test 5',
-				}
-			],
-			error: function(element, error) {
-				$(".error").html(error);
-			}
-		});
-		$(".staticMap").gMap({
-			map: "static",
-			width: 500,
-			height: 500,
-			markers: [
-				{
-					address: "Wichita Falls, TX",
-					icon: { color: "blue" }
-				},
-				{
-					address: "3906 Circle Dr. Wichita Falls, TX 76309",
-					icon: { size: "small", color: "green" }
-				},
-				{
-					address: "Iowa Park, TX",
-					icon: { size: "mid" }
-				}
-			],
-			polygons: [
-				{
-					points: [
-						[33.85839163821079, -98.48906972802736],
-						[33.88233677114602, -98.5570476333008],
-						[33.978050098130055, -98.50486257470705]
-					],
-					stroke: { color: '00ff00', weight: 7, opacity: 1 },
-					fill: { color: '00ff00', opacity: 0.2 }
-				}
-			],
-			error: function(element, error) {
-				$(".error").html(error);
-			}
-		});
-	});
-	</script>
+	<meta http-equiv="refresh" content="1;url=examples/1.html">
 </head>
 <body>
-	<div class="error"></div>
-	<div class="interactiveMap"></div>
-	<div class="staticMap"></div>
+
+<div id="wrapper">
+	<a href="examples/1.html">Redirecting to first example...</a>
+</div>
+
 </body>
 </html>
