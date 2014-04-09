@@ -10,9 +10,9 @@
 * Version 3.0.0- Last updated: April 8, 2014
 */
 (function($) {
-  jQuery.fn.gMap = function(options) {
-    var gMap;
-    var apiUrl = 'http://maps.google.com/maps/api/staticmap?';
+  jQuery.fn.gMap = function(opts) {
+    var gMap, map, geocode, infowindow, bounds;
+    var url = 'http://maps.google.com/maps/api/staticmap?';
 
     // Default map settings
     var options = $.extend({
@@ -51,7 +51,7 @@
       sensor: 'false', //STRING NOT BOOL
       title: 'Google Maps',
       scale: null // Scales image for higher respolution displays. (ex. 1,2,4)
-    }, options);
+    }, opts);
 
     // Default marker settings
     var markersDefOptions = {
@@ -150,8 +150,6 @@
 
       // Initialize map by type
       if(options.map == 'static') {
-        var url = apiUrl;
-
         // Add Settings
         url += 'size=' + options.style.width + 'x' + options.style.height;
 
@@ -159,15 +157,15 @@
           url += '&format=' + options.format;
         }
 
-        if(options.scale != null) {
+        if(options.scale !== null) {
           url += '&scale=' + options.scale;
         }
 
-        if(options.center != '') {
+        if(options.center !== '') {
           url += '&center=' + escape(options.center);
         }
 
-        if(options.zoom != '') {
+        if(options.zoom !== '') {
           url += '&zoom=' + options.zoom;
         }
 
@@ -187,7 +185,7 @@
         url += '&sensor=' + options.sensor;
       } else {
         // Initialize map
-        var map = new google.maps.Map(
+        map = new google.maps.Map(
           self,
           {
             mapTypeId: options.type,
@@ -197,15 +195,15 @@
         );
 
         // Geocoder
-        var geocoder = new google.maps.Geocoder();
+        geocoder = new google.maps.Geocoder();
 
         // Info Window
-        var infoWindow = new google.maps.InfoWindow();
+        infoWindow = new google.maps.InfoWindow();
 
         // Initialize map bounds
-        var bounds = new google.maps.LatLngBounds(0, 0);
+        bounds = new google.maps.LatLngBounds(0, 0);
 
-        if(options.zoom != '') {
+        if(options.zoom !== '') {
           map.setZoom(options.zoom);
         }
 
@@ -213,14 +211,14 @@
         if(options.center instanceof Array) {
           // Lat & Lng given
           map.setCenter(new google.maps.LatLng(options.center[0], options.center[1]));
-        } else if(options.center != '') {
+        } else if(options.center !== '') {
           // Address given
           geocoder.geocode( {'address': options.center}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
               map.setCenter(results[0].geometry.location);
               bounds.extend(results[0].geometry.location);
 
-              if(options.bounds == true) {
+              if(options.bounds === true) {
                 map.fitBounds(bounds);
               }
             } else {
@@ -239,7 +237,7 @@
         //       if (status == google.maps.GeocoderStatus.OK) {
         //         bounds.extend(results[0].geometry.location);
         //
-        //         if(options.bounds == true) {
+        //         if(options.bounds === true) {
         //           map.fitBounds(bounds);
         //         }
         //       } else {
@@ -249,7 +247,7 @@
         //   }
         // });
 
-        if(options.cursor != '') {
+        if(options.cursor !== '') {
           map.setOptions({
             draggableCursor: options.cursor
           });
@@ -264,28 +262,27 @@
       }
 
       // Add Markers
-      $(options.markers).each(function(item, markerOptions) {
-        var markerOptions = $.extend({}, markersDefOptions, markerOptions);
+      $(options.markers).each(function(item, markerOpts) {
+        var markerOptions = $.extend({}, markersDefOptions, markerOpts);
+        var marker = '';
 
         if(options.map == 'static') {
-          var marker = '';
-
           // Settings
           marker += 'size:' + markerOptions.icon.size;
           marker += '|color:' + markerOptions.icon.color;
 
           // Letter over marker
-          if(markerOptions.label != '') {
+          if(markerOptions.label !== '') {
             marker += '|label:' + markerOptions.label;
           }
 
           // Icon
-          if(markerOptions.icon.image != '') {
+          if(markerOptions.icon.image !== '') {
             marker += '|icon:' + escape(markerOptions.icon.image);
           }
 
           // Location
-          if(markerOptions.address != '') {
+          if(markerOptions.address !== '') {
             // Address
             marker += '|'+escape(markerOptions.address);
           } else {
@@ -297,7 +294,7 @@
           url += '&markers=' + marker;
         } else {
           // Initialize marker and attach to map
-          var marker = new google.maps.Marker({
+          marker = new google.maps.Marker({
             map: map,
             title: markerOptions.label
           });
@@ -317,7 +314,7 @@
                 marker.setPosition(results[0].geometry.location);
                 bounds.extend(results[0].geometry.location);
 
-                if(options.bounds == true) {
+                if(options.bounds === true) {
                   map.fitBounds(bounds);
                 }
               } else {
@@ -327,7 +324,7 @@
           }
 
           // Icon
-          if(markerOptions.icon.image != '') {
+          if(markerOptions.icon.image !== '') {
             // Complex Icon
             if(markerOptions.icon.type == 'complex') {
               marker.setIcon(
@@ -380,7 +377,7 @@
           }
 
           // Shadow
-          if(markerOptions.shadow.image != '') {
+          if(markerOptions.shadow.image !== '') {
             marker.setShadow(
               new google.maps.MarkerImage(
                 markerOptions.shadow.image,
@@ -391,11 +388,11 @@
             );
           }
 
-          if(markerOptions.click != undefined) {
+          if(markerOptions.click !== undefined) {
             google.maps.event.addListener(marker, "click", markerOptions.click);
           }
 
-          if(markerOptions.draggable == true) {
+          if(markerOptions.draggable === true) {
             marker.setDraggable(true);
             google.maps.event.addListener(marker, "dragend", markerOptions.dragend);
           }
@@ -406,7 +403,7 @@
 
             infoWindow.setOptions({content: markerOptions.content});
 
-            if(markerOptions.content != '')
+            if(markerOptions.content !== '')
               infoWindow.open(map, marker);
           });
 
@@ -414,12 +411,11 @@
       });
 
       // Add Polyline
-      $(options.polylines).each(function(item, polylineOptions) {
-        var polylineOptions = $.extend({}, polylineDefOptions, polylineOptions);
+      $(options.polylines).each(function(item, polylineOpts) {
+        var polylineOptions = $.extend({}, polylineDefOptions, polylineOpts);
+        var polyline = '';
 
         if(options.map == 'static') {
-          var polyline = '';
-
           // Convert stroke opacity to hex
           strokeHex = Math.floor(polylineOptions.stroke.opacity * 255).toString(16);
           if(strokeHex.length == 1) {
@@ -442,7 +438,7 @@
           var polylinePoints = new google.maps.MVCArray();
 
           // Initialize polyline and attach to map
-          var polyline = new google.maps.Polyline({
+          polyline = new google.maps.Polyline({
             map: map,
             path: polylinePoints,
             strokeColor: '#' + polylineOptions.stroke.color,
@@ -465,12 +461,11 @@
       });
 
       // Add Polygon
-      $(options.polygons).each(function(item, polygonOptions) {
-        var polygonOptions = $.extend({}, polygonDefOptions, polygonOptions);
+      $(options.polygons).each(function(item, polygonOpts) {
+        var polygonOptions = $.extend({}, polygonDefOptions, polygonOpts);
+        var polygon = '';
 
         if(options.map == 'static') {
-          var polygon = '';
-
           // Convert stroke opacity to hex
           strokeHex = Math.floor(polygonOptions.stroke.opacity * 255).toString(16);
           if(strokeHex.length == 1) {
@@ -504,7 +499,7 @@
           var polygonPoints = new google.maps.MVCArray();
 
           // Initialize polygon and attach to map
-          var polygon = new google.maps.Polygon({
+          polygon = new google.maps.Polygon({
             map: map,
             path: polygonPoints,
             strokeColor: '#' + polygonOptions.stroke.color,
@@ -529,8 +524,8 @@
       });
 
       // Add Circle
-      $(options.circles.reverse()).each(function(item, circleOptions) {
-        var circleOptions = $.extend({}, circleDefOptions, circleOptions);
+      $(options.circles.reverse()).each(function(item, circleOpts) {
+        var circleOptions = $.extend({}, circleDefOptions, circleOpts);
 
         if(options.map == 'static') {
           // TODO: Calculate a path to create a circle. Use encoded polylines.
@@ -571,7 +566,7 @@
           $(self).html('<img src="' + url + '" width="' + options.style.width + '" height="' + options.style.height + '" alt="' + options.title + '">');
         }
       } else {
-        if(options.bounds == true) {
+        if(options.bounds === true) {
           map.fitBounds(bounds);
         }
 
