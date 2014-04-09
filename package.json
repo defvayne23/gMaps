@@ -1,0 +1,35 @@
+{
+  "name": "gmaps",
+  "version": "3.0.0",
+  "description": "jQuery plugin to easily add Google Maps to your websites. Makes use of both v3 and static API.",
+  "keywords": [
+    "jquery",
+    "javascript",
+    "google",
+    "maps",
+    "api",
+    "plugin",
+    "gmaps"
+  ],
+  "homepage": "http://gmaps.monkeecreate.com",
+  "bugs": "https://github.com/defvayne23/gMaps/issues",
+  "author": {
+    "name": "John Hoover",
+    "email": "defvayne23@gmail.com",
+    "url": "https://github.com/defvayne23"
+  },
+  "main": "jquery.gMaps.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/defvayne23/gMaps.git"
+  },
+  "engines": {
+    "node": ">=0.8.0",
+    "npm": ">=1.2.10"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ]
+}
