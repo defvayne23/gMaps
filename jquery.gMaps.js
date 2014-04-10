@@ -37,9 +37,8 @@
 
     var encodepoint = function(lat, lng) {
       encodedpoint = '';
-      console.log(lat, lng);
       $.each([lat, lng], function() {
-        point = Math.floor(point * 1e5)
+        point = Math.floor(this * 1e5);
       });
 
       return encodedpoint;
@@ -166,8 +165,6 @@
       position: [],
       opacity: 1
     };
-
-    console.log(options);
 
     // Loop given elements
     this.each(function() {
