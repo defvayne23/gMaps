@@ -312,7 +312,7 @@
       // Add Markers
       $(options.markers).each(function(item, markerOpts) {
         var markerOptions = $.extend(true, {}, markersDefOptions, markerOpts);
-        var marker;
+        var marker = '';
 
         if(options.map === 'static') {
           // Settings
@@ -466,7 +466,7 @@
       // Add Polyline
       $(options.polylines).each(function(item, polylineOpts) {
         var polylineOptions = $.extend(true, {}, polylineDefOptions, polylineOpts);
-        var polyline;
+        var polyline = '';
 
         if(options.map === 'static') {
           // Convert stroke opacity to hex
@@ -520,7 +520,7 @@
       // Add Polygon
       $(options.polygons).each(function(item, polygonOpts) {
         var polygonOptions = $.extend(true, {}, polygonDefOptions, polygonOpts);
-        var polygon;
+        var polygon = '';
 
         if(options.map === 'static') {
           // Convert stroke opacity to hex
@@ -589,7 +589,7 @@
       // Add Circle
       $(options.circles.reverse()).each(function(item, circleOpts) {
         var circleOptions = $.extend(true, {}, circleDefOptions, circleOpts);
-        var circle;
+        var circle = '';
 
         if(options.map === 'static') {
           // TODO: Calculate a path to create a circle. Use encoded polylines.
