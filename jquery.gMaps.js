@@ -7,7 +7,7 @@
 * Developed by John Hoover <http://defvayne23.com>
 * Another project from monkeeCreate <http://monkeecreate.com>
 *
-* Version 3.0.0- Last updated: April 8, 2014
+* Version 3.1.0- Last updated: April 17, 2014
 */
 (function($) {
   jQuery.fn.gMap = function(opts) {
@@ -33,15 +33,6 @@
           options.error(self, "No results were found for given address.");
         }
       });
-    };
-
-    var encodepoint = function(lat, lng) {
-      encodedpoint = '';
-      $.each([lat, lng], function() {
-        point = Math.floor(this * 1e5);
-      });
-
-      return encodedpoint;
     };
 
     // Default map settings
@@ -332,7 +323,6 @@
           // Location
           if(markerOptions.position instanceof Array) {
             // Lat/Lng
-            encodepoint(markerOptions.position[0], markerOptions.position[1]);
             marker += '|'+markerOptions.position[0] + "," + markerOptions.position[1];
           } else {
             // Address
@@ -479,10 +469,11 @@
           polyline += 'color:0x' + polylineOptions.stroke.color+strokeHex;
           polyline += '|weight:' + polylineOptions.stroke.weight;
 
-          // TODO: Convert LatLng to encoded point.
+          var polyline_points = new google.maps.MVCArray();
           $(polylineOptions.points).each(function(item, point) {
-            polyline += '|'+ point[0] + ',' + point[1];
+            polyline_points.push( new google.maps.LatLng(point[0], point[1]) );
           });
+          polyline += '|enc:' + google.maps.geometry.encoding.encodePath( polyline_points );
 
           // Add polyline to url
           url += '&path=' + polyline;
@@ -540,14 +531,15 @@
           polygon += '|weight:' + polygonOptions.stroke.weight;
           polygon += '|fillcolor:0x' + polygonOptions.fill.color+fillHex;
 
-          // TODO: Convert LatLng to encoded point.
+          var polygon_points = new google.maps.MVCArray();
           $(polygonOptions.points).each(function(item, point) {
-            polygon += '|' + point[0] + ',' + point[1];
+            polygon_points.push( new google.maps.LatLng(point[0], point[1]) );
 
             // End the polygon with the beginning point to close it.
             if(polygonOptions.points.length - 1 === item)
-            polygon += '|' + polygonOptions.points[0][0] + ',' + polygonOptions.points[0][1];
+              polygon_points.push( new google.maps.LatLng(polygonOptions.points[0][0], polygonOptions.points[0][1]) );
           });
+          polygon += '|enc:' + google.maps.geometry.encoding.encodePath( polygon_points );
 
           // Add polygon to url
           url += '&path=' + polygon;
