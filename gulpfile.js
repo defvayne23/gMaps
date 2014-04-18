@@ -1,23 +1,40 @@
 var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     jshint = require('gulp-jshint'),
+    bump = require('gulp-bump'),
     rename = require('gulp-rename'),
-    notify = require('gulp-notify')
-    gutil = require('gulp-util');
+    gutil = require('gulp-util'),
+    git = require('gulp-git'),
+    size = require('gulp-size'),
+    pkg = require('./package.json');
 
-gulp.task('gmaps', function() {
-  // Minify and concat JS
-  gulp.src('jquery.gMaps.js')
-    .pipe(rename('jquery.gMaps.min.js'))
+var source = "jquery.gMaps.js",
+    sourceMin = "jquery.gMaps.min.js";
+
+gulp.task('lint', function () {
+  return gulp.src(source)
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('build', ['lint'], function() {
+  return gulp.src(source)
+    .pipe(rename(sourceMin))
     .pipe(uglify({ preserveComments: 'some' }))
-    .pipe(gulp.dest(''))
-    .pipe(notify({ message: 'gMaps task complete.' }));
+    .pipe(size())
+    .pipe(gulp.dest('./'));
 });
 
-// Rerun the task when a file changes
-gulp.task('watch', function() {
-  gulp.watch('jquery.gMaps.js', ['gmaps']);
+gulp.task('bump', function () {
+  return gulp.src(['./bower.json', './component.json'])
+    .pipe(bump({version: pkg.version}))
+    .pipe(gulp.dest('./'));
 });
 
-// The default task (called when you run `gulp` from cli)
-gulp.task('default', ['gmaps']);
+gulp.task('tag', ['bump'], function () {
+  return gulp.src('./')
+    .pipe(git.commit('Version '+pkg.version))
+    .pipe(git.tag(pkg.version, 'Version '+pkg.version))
+    .pipe(git.push('origin', 'master', '--tags'))
+    .pipe(gulp.dest('./'));
+});

@@ -31,5 +31,16 @@
     {
       "type": "MIT"
     }
-  ]
+  ],
+  "devDependencies": {
+    "gulp": "latest",
+    "gulp-uglify": "latest",
+    "gulp-jshint": "latest",
+    "gulp-rename": "latest",
+    "gulp-bump": "latest",
+    "gulp-git": "~0.2.0",
+    "gulp-size": "latest",
+    "jshint-stylish": "latest",
+    "gulp-notify": "latest"
+  }
 }
