@@ -139,6 +139,8 @@
     var circleDefOptions = {
       center: [],
       radius: 1, // In meters
+      measure: 'm', // Radius measured in. (m, km, mi)
+      detail: 8, // Place a point every # degrees for 360 degrees.
       stroke: {
         color: 'ff0000',
         opacity: 1,
@@ -584,12 +586,68 @@
         var circle = '';
 
         if(options.map === 'static') {
-          // TODO: Calculate a path to create a circle. Use encoded polylines.
-          // https://stackoverflow.com/questions/7316963/drawing-a-circle-google-static-maps
-          // Do nothing
+          // TODO: Change code to expect m instead of km
+          switch(circleOptions.measure) {
+            case "m":
+              circleOptions.radius = circleOptions.radius / 1000;
+              break;
+            case "mi":
+              circleOptions.radius = circleOptions.radius / 0.62137;
+              break;
+          }
+
+          // Convert stroke opacity to hex
+          strokeHex = Math.floor(circleOptions.stroke.opacity * 255).toString(16);
+          if(strokeHex.length === 1) {
+            strokeHex = 0+strokeHex;
+          }
+
+          // Convert fill opacity to hex
+          fillHex = Math.floor(circleOptions.fill.opacity * 255).toString(16);
+          if(fillHex.length === 1) {
+            fillHex = 0+fillHex;
+          }
+
+          // Settings
+          circle += 'color:0x' + circleOptions.stroke.color+strokeHex;
+          circle += '|weight:' + circleOptions.stroke.weight;
+          circle += '|fillcolor:0x' + circleOptions.fill.color+fillHex;
+
+          r = 6371;
+          pi = Math.PI;
+          circle_lat  = (circleOptions.center[0] * pi) / 180;
+          circle_lng  = (circleOptions.center[1] * pi) / 180;
+          circle_radius    = circleOptions.radius / r;
+
+          circle_points = new google.maps.MVCArray();
+
+          for(var i=0;i<=360;i+=circleOptions.detail) {
+            brng = i * pi / 180;
+
+            pLat = Math.asin(Math.sin(circle_lat)*Math.cos(circle_radius) + Math.cos(circle_lat)*Math.sin(circle_radius)*Math.cos(brng));
+            pLng = ((circle_lng + Math.atan2(Math.sin(brng)*Math.sin(circle_radius)*Math.cos(circle_lat), Math.cos(circle_radius)-Math.sin(circle_lat)*Math.sin(pLat))) * 180) / pi;
+            pLat = (pLat * 180) / pi;
+
+            circle_points.push( new google.maps.LatLng(pLat,pLng) );
+          }
+
+          circle += '|enc:' + google.maps.geometry.encoding.encodePath( circle_points );
+
+          console.log(circle);
+          // Add circle to url
+          url += '&path=' + circle;
         } else {
           // TODO: strokePosition
           // TODO: zIndex
+
+          switch(circleOptions.measure) {
+            case "km":
+              circleOptions.radius = circleOptions.radius * 1000;
+              break;
+            case "mi":
+              circleOptions.radius = circleOptions.radius / 0.00062137;
+              break;
+          }
 
           circle = new google.maps.Circle({
             map: map,
