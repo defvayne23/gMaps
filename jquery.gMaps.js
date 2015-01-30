@@ -7,7 +7,7 @@
 * Developed by John Hoover <http://defvayne23.com>
 * Another project from monkeeCreate <http://monkeecreate.com>
 *
-* Version 3.1.0- Last updated: April 17, 2014
+* Version 3.2.0- Last updated: April 20, 2014
 */
 (function($) {
   jQuery.fn.gMap = function(opts) {
